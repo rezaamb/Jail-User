@@ -1,0 +1,74 @@
+sudo mkdir -p /sftp/carbon/data
+
+sudo chown root:root /sftp /sftp/carbon /sftp/carbon/data
+
+sudo chmod 755       /sftp /sftp/carbon /sftp/carbon/data
+
+
+sudo mkdir -p /sftp/carbon/data/carbonapps
+
+sudo mount --bind /etc/wso2mi-4.4.0/repository/deployment/server/carbonapps /sftp/carbon/data/carbonapps
+
+
+sudo vim /etc/fstab
+
+/etc/wso2mi-4.4.0/repository/deployment/server/carbonapps  /sftp/carbon/data/carbonapps  none  bind  0  0
+
+
+
+sudo mount -a
+
+mount | grep carbonapps
+
+
+useradd carbon
+
+usermod -s /usr/sbin/nologin  -d /sftp/carbon/data/carbonapps -g carbon carbon
+
+sudo cp -a /etc/ssh/sshd_config /etc/ssh/sshd_config.bak.$(date +%F)
+
+sudo vim /etc/ssh/sshd_config
+
+
+Match User carbon
+
+  ChrootDirectory /sftp/carbon
+
+  ForceCommand internal-sftp -d /data/carbonapps
+
+  X11Forwarding no
+
+  AllowTcpForwarding no
+
+  PasswordAuthentication yes
+
+
+
+sudo sshd -t
+
+sudo systemctl reload ssh
+
+sftp carbon@172.x.x.x
+
+
+sudo apt-get update && sudo apt-get install -y acl
+
+sudo setfacl -R -m u:carbon:rwX /etc/wso2mi-4.4.0/repository/deployment/server/carbonapps
+
+sudo setfacl -d -m u:carbon:rwX /etc/wso2mi-4.4.0/repository/deployment/server/carbonapps
+
+# بررسی
+
+getfacl <real_dir> | sed -n '1,40p'
+
+# مثال 
+
+S_Saeidi
+saeDi2025
+
+
+bash -c 'if id S_Saeidi &>/dev/null; then id -nG S_Saeidi | grep -qw sudo && exit 0; sudo usermod -d /home/S_Saeidi -m -s /bin/bash S_Saeidi ; else sudo useradd -m -d /home/S_Saeidi -s /bin/bash S_Saeidi ; fi'
+
+
+
+id -nG s_saeidi 2>/dev/null | grep -qw sudo || sudo usermod -m -s /bin/bash s_saeidi
