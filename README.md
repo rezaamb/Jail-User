@@ -31,8 +31,10 @@ sudo vim /etc/fstab
 
 sudo mount -a
 
-
+# مثال
 
 user: carbon
+
 pass: carbon
+
 home direc : 
